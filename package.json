@@ -1,0 +1,37 @@
+{
+  "name": "tchaudhry-pi-extensions",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Personal Pi coding agent extensions, skills, prompts, and themes.",
+  "keywords": [
+    "pi-package"
+  ],
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions"
+    ],
+    "skills": [
+      "./skills"
+    ],
+    "prompts": [
+      "./prompts"
+    ],
+    "themes": [
+      "./themes"
+    ]
+  }
+}
