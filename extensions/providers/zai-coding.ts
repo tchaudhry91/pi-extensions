@@ -69,7 +69,7 @@ async function discoverModels(): Promise<ProviderModelConfig[]> {
         id: typeof model.id === "string" ? model.id : undefined,
         name: typeof model.name === "string" ? model.name : undefined,
       }))
-      .filter((model): model is { id: string; name?: string } => Boolean(model.id))
+      .filter((model): model is { id: string; name: string | undefined } => typeof model.id === "string")
       .map((model) => toModelConfig(model.id, model.name));
 
     return models.length > 0 ? models : FALLBACK_MODEL_IDS.map((id) => toModelConfig(id));
