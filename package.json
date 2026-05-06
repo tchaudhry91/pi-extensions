@@ -11,6 +11,9 @@
   "scripts": {
     "check": "tsc --noEmit"
   },
+  "dependencies": {
+    "@ollama/pi-web-search": "^0.0.5"
+  },
   "peerDependencies": {
     "@mariozechner/pi-ai": "*",
     "@mariozechner/pi-coding-agent": "*",
@@ -23,7 +26,8 @@
   },
   "pi": {
     "extensions": [
-      "./extensions/**/*.ts"
+      "./extensions/providers/ollama-cloud.ts",
+      "./extensions/providers/zai-coding.ts"
     ],
     "skills": [
       "./skills"
