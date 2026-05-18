@@ -18,7 +18,8 @@ The `package.json` `"pi"` section declares what pi loads:
     "extensions": [
       "./extensions/providers/ollama-cloud.ts",
       "./extensions/providers/zai-coding.ts",
-      "./extensions/search/searxng.ts"
+      "./extensions/search/searxng.ts",
+      "./extensions/fetch/web-fetch.ts"
     ],
     "skills": ["./skills"],
     "prompts": ["./prompts"],
@@ -37,6 +38,8 @@ pi-extensions/
 │   │   └── zai-coding.ts
 │   └── search/           # Tool registrations
 │       └── searxng.ts
+│   └── fetch/             # Web fetching
+│       └── web-fetch.ts
 ├── skills/               # Skill markdown folders (SKILL.md)
 ├── prompts/              # Slash-command prompt templates
 ├── themes/               # Theme JSON files
@@ -81,7 +84,7 @@ Caching: `ollama-cloud.ts` demonstrates a file-based cache in `getAgentDir()/cac
 
 ### Pattern: Tool registration
 
-Tool extensions register custom tools callable by the LLM. See `extensions/search/searxng.ts`.
+Tool extensions register custom tools callable by the LLM. See `extensions/search/searxng.ts` and `extensions/fetch/web-fetch.ts`.
 
 Key steps:
 1. Define parameters using TypeBox schemas (`Type.Object`, `Type.String`, `Type.Integer`, `StringEnum`, etc.)
@@ -110,6 +113,8 @@ Commands are registered via `pi.registerCommand(name, { description, handler, ge
 | `Text` | `@mariozechner/pi-tui` | TUI text rendering |
 
 **Important**: `@mariozechner/pi-*` and `typebox` are declared as **peerDependencies** in `package.json`. pi provides its own copies at runtime. Do not add them to `dependencies`.
+
+Runtime dependencies (like `linkedom` and `@mozilla/readability` used by `web-fetch.ts`) must be in `dependencies` — pi uses `npm install --omit=dev` for installed packages.
 
 ## Adding new resources
 
