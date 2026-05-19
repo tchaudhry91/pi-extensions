@@ -1,20 +1,22 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { DEFAULT_MAX_BYTES, DEFAULT_MAX_LINES, formatSize, truncateHead } from "@earendil-works/pi-coding-agent";
+import { formatSize, truncateHead } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 import { Type, type Static } from "typebox";
 import { parseHTML } from "linkedom";
 import { Readability } from "@mozilla/readability";
 
 const FETCH_TIMEOUT_MS = 15_000;
-const MAX_CONTENT_BYTES = 500_000; // hard cap before parsing
+const MAX_CONTENT_BYTES = 3_000_000; // hard cap on raw HTML before parsing (3 MB — never sent to LLM, only parsed locally)
+const DEFAULT_OUTPUT_BYTES = 150_000; // default max bytes for extracted output sent to LLM
+const DEFAULT_OUTPUT_LINES = 8_000;  // default max lines for extracted output sent to LLM
 
 const WebFetchParams = Type.Object({
   url: Type.String({ description: "URL to fetch and extract content from" }),
   maxLength: Type.Optional(
     Type.Integer({
-      description: `Maximum characters of extracted content to return. Defaults to ${DEFAULT_MAX_BYTES} bytes (truncated by lines too).`,
+      description: `Maximum characters of extracted content to return. Defaults to ${DEFAULT_OUTPUT_BYTES} bytes (${(DEFAULT_OUTPUT_BYTES / 1024).toFixed(0)} KB). Truncated by line count too.`,
       minimum: 100,
-      maximum: 100_000,
+      maximum: 500_000,
     }),
   ),
 });
@@ -233,10 +235,10 @@ export default function (pi: ExtensionAPI) {
     async execute(_toolCallId, params, signal) {
       const result = await fetchAndExtract(params.url);
 
-      // Truncate with pi's built-in truncation
-      const maxBytes = params.maxLength ?? DEFAULT_MAX_BYTES;
+      // Truncate with our relaxed defaults
+      const maxBytes = params.maxLength ?? DEFAULT_OUTPUT_BYTES;
       const head = truncateHead(result.content, {
-        maxLines: DEFAULT_MAX_LINES,
+        maxLines: DEFAULT_OUTPUT_LINES,
         maxBytes,
       });
 
