@@ -52,4 +52,4 @@ npm install
 npm run check
 ```
 
-Pi provides its own runtime copies of `@mariozechner/pi-*` and `typebox`; they are declared as peer dependencies here.
+Pi provides its own runtime copies of `@earendil-works/pi-*` and `typebox`; they are declared as peer dependencies here.

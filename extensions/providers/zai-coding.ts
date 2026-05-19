@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ProviderModelConfig } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 
 const PROVIDER = "zai-coding";
 const BASE_URL = "https://api.z.ai/api/coding/paas/v4";

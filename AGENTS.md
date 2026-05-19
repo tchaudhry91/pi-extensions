@@ -61,7 +61,7 @@ pi-extensions/
 Every extension file exports a **default function** (sync or async) that receives `ExtensionAPI` as its single argument. Use `import type` for pi types to avoid runtime import issues:
 
 ```typescript
-import type { ExtensionAPI, ExtensionCommandContext, ProviderModelConfig } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext, ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 
 export default async function (pi: ExtensionAPI) {
   // ... extension logic
@@ -103,16 +103,16 @@ Commands are registered via `pi.registerCommand(name, { description, handler, ge
 
 | Import | Package | Use |
 |--------|---------|-----|
-| `ExtensionAPI` | `@mariozechner/pi-coding-agent` | Type for the `pi` parameter |
-| `ExtensionCommandContext` | `@mariozechner/pi-coding-agent` | Type for command handler context |
-| `ProviderModelConfig` | `@mariozechner/pi-coding-agent` | Type for model configuration |
-| `getAgentDir` | `@mariozechner/pi-coding-agent` | Pi's agent cache directory |
-| `truncateHead`, `formatSize`, `DEFAULT_MAX_BYTES`, `DEFAULT_MAX_LINES` | `@mariozechner/pi-coding-agent` | Output formatting utilities |
+| `ExtensionAPI` | `@earendil-works/pi-coding-agent` | Type for the `pi` parameter |
+| `ExtensionCommandContext` | `@earendil-works/pi-coding-agent` | Type for command handler context |
+| `ProviderModelConfig` | `@earendil-works/pi-coding-agent` | Type for model configuration |
+| `getAgentDir` | `@earendil-works/pi-coding-agent` | Pi's agent cache directory |
+| `truncateHead`, `formatSize`, `DEFAULT_MAX_BYTES`, `DEFAULT_MAX_LINES` | `@earendil-works/pi-coding-agent` | Output formatting utilities |
 | `Type`, `Static` | `typebox` | Schema definitions for tool parameters |
-| `StringEnum` | `@mariozechner/pi-ai` | Enum-like string validation |
-| `Text` | `@mariozechner/pi-tui` | TUI text rendering |
+| `StringEnum` | `@earendil-works/pi-ai` | Enum-like string validation |
+| `Text` | `@earendil-works/pi-tui` | TUI text rendering |
 
-**Important**: `@mariozechner/pi-*` and `typebox` are declared as **peerDependencies** in `package.json`. pi provides its own copies at runtime. Do not add them to `dependencies`.
+**Important**: `@earendil-works/pi-*` and `typebox` are **peerDependencies**. Pi provides its own copies at runtime. Do not add them to `dependencies`.
 
 Runtime dependencies (like `linkedom` and `@mozilla/readability` used by `web-fetch.ts`) must be in `dependencies` — pi uses `npm install --omit=dev` for installed packages.
 
