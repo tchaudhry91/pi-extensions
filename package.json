@@ -28,7 +28,6 @@
   "pi": {
     "extensions": [
       "./extensions/providers/ollama-cloud.ts",
-      "./extensions/providers/zai-coding.ts",
       "./extensions/search/searxng.ts",
       "./extensions/fetch/web-fetch.ts"
     ],
