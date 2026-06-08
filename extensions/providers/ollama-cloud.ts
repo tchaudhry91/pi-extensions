@@ -68,7 +68,7 @@ function normalizeBaseUrl(url: string): string {
 }
 
 function providerApiKeyValue(): string {
-  return process.env[API_KEY_ENV_PRIMARY] ? API_KEY_ENV_PRIMARY : API_KEY_ENV_FALLBACK;
+  return process.env[API_KEY_ENV_PRIMARY] ? `$${API_KEY_ENV_PRIMARY}` : `$${API_KEY_ENV_FALLBACK}`;
 }
 
 function discoveryHeaders(): Record<string, string> {
