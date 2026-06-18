@@ -29,7 +29,8 @@
     "extensions": [
       "./extensions/providers/ollama-cloud.ts",
       "./extensions/search/searxng.ts",
-      "./extensions/fetch/web-fetch.ts"
+      "./extensions/fetch/web-fetch.ts",
+      "./extensions/pdf/pdf-read.ts"
     ],
     "skills": [
       "./skills"
