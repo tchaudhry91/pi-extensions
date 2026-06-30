@@ -28,6 +28,7 @@
   "pi": {
     "extensions": [
       "./extensions/providers/ollama-cloud.ts",
+      "./extensions/providers/qe93-ollama.ts",
       "./extensions/search/searxng.ts",
       "./extensions/fetch/web-fetch.ts",
       "./extensions/pdf/pdf-read.ts"
