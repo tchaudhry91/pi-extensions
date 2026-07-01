@@ -2,7 +2,7 @@
 name: deep-research
 description: Multi-round web research methodology. Searches from multiple angles, fetches full page contents, cross-references findings, identifies gaps, and produces a synthesized markdown document with inline citations. Use for deep topic exploration, literature surveys, technology comparisons, or any task requiring thorough web-sourced information synthesis.
 metadata:
-  tools: searxng_search, web_fetch, write, read, bash
+  tools: searxng_search, arxiv_search, web_read, pdf_info, pdf_read, write, read, bash
 ---
 
 # Deep Research
@@ -12,9 +12,11 @@ Multi-round web research methodology. Goes deep: multiple search angles, full so
 ## Tools Used
 
 - **`searxng_search`** — web search (supports categories, time ranges, languages)
-- **`web_fetch`** — extract readable content from URLs
+- **`arxiv_search`** — academic preprint discovery with arXiv IDs, abstracts, categories, and PDF links (no login/API key)
+- **`web_read`** — extract readable content from URLs (modes, caching, `offset`/`limit` chunking)
+- **`pdf_info` / `pdf_read`** — inspect and read PDFs from arXiv or other sources
 - **`write`** — write the final document to disk
-- **`read`** / **`bash`** — as needed for context
+- **`read`** / **`bash`** — as needed for context (also use `read` on a truncated source's `fullOutputPath`/`cachePath` returned by `web_read`)
 
 ## Research Methodology
 
@@ -30,7 +32,7 @@ Before searching, decompose the topic into **3-5 distinct angles**. Each angle s
 | Comparative | "topic vs alternative comparison" | Context, trade-offs |
 | News/Recent | "topic latest developments 2025" | Timeliness, trends |
 
-Run all queries in parallel with `searxng_search`, 5-8 results each. Use time ranges when recency matters.
+Run all general-web queries in parallel with `searxng_search`, 5-8 results each. Use time ranges when recency matters. For academic/literature topics, also run `arxiv_search` using 2-4 vocabulary variants; start broad, then refine based on terms discovered in paper titles/abstracts. Remember that arXiv papers are preprints and are not necessarily peer reviewed.
 
 ### Phase 2: Source Triage
 
@@ -39,20 +41,22 @@ From search results, select sources for deep reading. Prioritize:
 2. **Authoritative secondary**: respected publications, well-known authors, .edu/.gov domains
 3. **Diverse perspectives**: different viewpoints, contrarian takes, practical vs theoretical
 
+For `arxiv_search` results, triage by title, abstract, date, categories, venue/comment field, and relevance to the user's question. Do not treat arXiv presence as validation; use `pdf_info`/`pdf_read` on promising PDFs before making detailed claims.
+
 Skip: SEO spam, content farms, aggregators that just link elsewhere, sources older than relevance cutoff unless historical context is needed.
 
 Mark which sources you're fetching and why. If a search returns poor results, note it and adjust queries.
 
 ### Phase 3: Deep Extraction
 
-Fetch selected sources with `web_fetch`. Extract:
+Fetch selected sources with `web_read` (use `mode: "markdown"` for docs/code-heavy pages). Extract:
 - Key claims and findings
 - Data points, numbers, statistics
 - Methodologies described
 - Agreements and contradictions with other sources
 - Unanswered questions or acknowledged gaps
 
-Fetch in parallel batches of 3-5 to manage throughput. If a fetch fails (timeout, paywall, error), note it and move on — don't retry more than once.
+Fetch in parallel batches of 3-5 to manage throughput. If a fetch fails (timeout, paywall, error), note it and move on — don't retry more than once. If `web_read` truncates a long source, continue with the returned `fullOutputPath`/`cachePath` via `read`, or refetch with a larger `offset`/`limit`.
 
 ### Phase 4: Gap Analysis & Follow-up
 

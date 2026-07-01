@@ -30,7 +30,8 @@
       "./extensions/providers/ollama-cloud.ts",
       "./extensions/providers/qe93-ollama.ts",
       "./extensions/search/searxng.ts",
-      "./extensions/fetch/web-fetch.ts",
+      "./extensions/fetch/web-read.ts",
+      "./extensions/research/arxiv.ts",
       "./extensions/pdf/pdf-read.ts"
     ],
     "skills": [

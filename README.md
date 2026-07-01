@@ -4,8 +4,13 @@ Personal package/monorepo for Pi coding agent resources:
 
 - `extensions/` - TypeScript extensions
   - `extensions/providers/ollama-cloud.ts` - discovers and registers Ollama Cloud models from `https://ollama.com`
-  - `extensions/providers/qe93-ollama.ts` - discovers and registers local Ollama models from the QE93 backend
-  - `extensions/pdf/pdf-read.ts` - reads PDFs with `pdftotext` and optional Ollama Cloud OCR via `minimax-m3`
+  - `extensions/providers/qe93-ollama.ts` - discovers and registers local Ollama models from the QE93 backend (silent when the host is down)
+  - `extensions/providers/zai-coding.ts` - dormant ZAI Coding provider (not loaded by default)
+  - `extensions/search/searxng.ts` - SearXNG web search tool
+  - `extensions/fetch/web-read.ts` - `web_read` tool: fetches a URL and extracts content (readable/markdown/text/raw) with caching and chunking
+  - `extensions/research/arxiv.ts` - `arxiv_search` tool: keyless arXiv paper/preprint discovery with PDF links
+  - `extensions/pdf/pdf-read.ts` - `pdf_info` + `pdf_read` tools: `pdftotext` with optional Ollama Cloud OCR via `minimax-m3`
+- `docs/` - design docs and roadmap (start with `docs/research-workflow-improvement-plan.md`)
 - `skills/` - reusable skills (`SKILL.md` folders or top-level markdown)
 - `prompts/` - slash-command prompt templates
 - `themes/` - theme JSON files
@@ -51,7 +56,7 @@ Commands:
 
 The QE93 provider registers local Ollama models under provider `qe93`. It discovers models from Ollama's `/api/tags` + `/api/show` endpoints and exposes completion models with tool support.
 
-By default it uses the Ollama instance on this machine. Override it with `QE93_OLLAMA_BASE_URL` (or fallback `QE93_OLLAMA_HOST`):
+Discovery is **silent on startup** when the local host is simply down (connection refused / timeout / DNS) — it falls back to the cached model list instead of printing a warning on every launch. Use `/qe93-test` to diagnose connection issues explicitly. Override the host with `QE93_OLLAMA_BASE_URL` (or fallback `QE93_OLLAMA_HOST`):
 
 ```bash
 export QE93_OLLAMA_BASE_URL="http://127.0.0.1:11434"
@@ -75,6 +80,45 @@ Commands:
 - `/qe93-test` - test the configured Ollama connection
 - `/qe93-refresh` - refresh model discovery and re-register provider `qe93`
 - `/qe93-models` - show currently registered QE93 model IDs
+
+## Web reading
+
+The `web_read` tool fetches a URL and extracts content as markdown. It supersedes the older `web_fetch` behavior with research-grade semantics.
+
+Parameters of note:
+
+- `mode` - `readable` (default, Readability-first) | `markdown` (structured HTML→markdown, preserves code/tables better) | `text` (plain text) | `raw` (raw HTML)
+- `offset` / `limit` - read later chunks of long pages (UTF-8 byte offset/limit into extracted content)
+- `maxLength` - max bytes returned in one call (default ~150 KB; up to 1 MB)
+- `cache` / `refresh` - local cache under Pi's agent cache dir, keyed by URL + mode (`refresh` ignores the cache and refetches)
+- `includeLinks` / `includeMetadata` - append link list / extra metadata to the output
+
+Behavior:
+
+- Always extracts the **full** content locally; if the returned window is truncated, the full output is saved to a temp file and the path is returned (`details.fullOutputPath`). The cached full content path is also returned (`details.cachePath`) so it can be read directly.
+- PDF responses are detected and rejected with a pointer to `pdf_read`.
+- Non-HTML content (text, markdown, JSON) is returned as-is (JSON is pretty-printed in readable/markdown/text modes).
+
+Command: `/web-read-test <url>`.
+
+## arXiv paper search
+
+The `arxiv_search` tool searches arXiv's public Atom API. It does **not** require a login, API key, or environment variable.
+
+Parameters of note:
+
+- `query` - plain text is converted to a stricter `all:term AND all:term` arXiv query; advanced arXiv syntax like `ti:`, `au:`, `abs:`, `cat:`, `AND`, `OR` is passed through
+- `categories` - optional category filters such as `cs.DC`, `cs.OS`, `cs.SE`, `cs.NI`, `cs.PF`
+- `sortBy` / `sortOrder` - `relevance`, `lastUpdatedDate`, or `submittedDate`; `ascending` or `descending`
+- `start` / `maxResults` - pagination and result count (`maxResults` defaults to 10, capped at 50)
+
+Behavior:
+
+- Returns triage-friendly paper metadata: title, authors, arXiv ID, published/updated dates, categories, abstract summary, arXiv URL, and PDF URL.
+- Adds a reminder that arXiv papers are preprints and are not necessarily peer reviewed.
+- Use returned PDF URLs with `pdf_info` / `pdf_read` for deep reading.
+
+Command: `/arxiv-search-test <query>`.
 
 ## PDF reading / OCR
 

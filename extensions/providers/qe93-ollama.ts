@@ -231,7 +231,36 @@ async function fetchModelDetails(baseUrl: string, tags: NonNullable<OllamaTagsRe
   return models;
 }
 
-async function discoverModels(baseUrl: string): Promise<ProviderModelConfig[]> {
+function isConnectionError(error: unknown): boolean {
+  if (error instanceof DOMException && error.name === "AbortError") return true;
+  if (error instanceof TypeError) return true; // fetch() throws TypeError on network failure
+
+  let cursor: unknown = error;
+  for (let depth = 0; depth < 5 && cursor; depth += 1) {
+    const code = (cursor as { code?: unknown })?.code;
+    if (
+      typeof code === "string" &&
+      [
+        "ECONNREFUSED",
+        "ECONNRESET",
+        "ENOTFOUND",
+        "EAI_AGAIN",
+        "ENETUNREACH",
+        "EHOSTUNREACH",
+        "UND_ERR_CONNECT_TIMEOUT",
+        "UND_ERR_SOCKET",
+      ].includes(code)
+    ) {
+      return true;
+    }
+    cursor = (cursor as { cause?: unknown })?.cause;
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+  return /fetch failed|other side closed|connect ECONNREFUSED|ENOTFOUND|EAI_AGAIN/i.test(message);
+}
+
+async function discoverModels(baseUrl: string, silent = false): Promise<ProviderModelConfig[]> {
   try {
     const tags = await fetchJson<OllamaTagsResponse>(`${baseUrl}/api/tags`, { headers: discoveryHeaders() });
     const rawTags = Array.isArray(tags.models) ? tags.models : [];
@@ -247,7 +276,11 @@ async function discoverModels(baseUrl: string): Promise<ProviderModelConfig[]> {
     writeCache(baseUrl, rawDetails);
     return models;
   } catch (error) {
-    console.warn(`[${PROVIDER}] Model discovery failed for ${baseUrl}:`, error);
+    // On startup the local Ollama host is usually just down. Stay quiet in that case;
+    // surface unexpected (non-connection) errors so misconfig is still visible.
+    if (!(silent && isConnectionError(error))) {
+      console.warn(`[${PROVIDER}] Model discovery failed for ${baseUrl}:`, error);
+    }
     return readCache(baseUrl) ?? [];
   }
 }
@@ -275,7 +308,7 @@ function registerProvider(pi: ExtensionAPI, baseUrl: string, models: ProviderMod
 
 export default async function qe93OllamaExtension(pi: ExtensionAPI) {
   const baseUrl = configuredBaseUrl();
-  let models = await discoverModels(baseUrl);
+  let models = await discoverModels(baseUrl, true);
   registerProvider(pi, baseUrl, models);
 
   pi.registerCommand("qe93-refresh", {
