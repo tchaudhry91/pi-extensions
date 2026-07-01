@@ -9,6 +9,7 @@ Personal package/monorepo for Pi coding agent resources:
   - `extensions/search/searxng.ts` - SearXNG web search tool
   - `extensions/fetch/web-read.ts` - `web_read` tool: fetches a URL and extracts content (readable/markdown/text/raw) with caching and chunking
   - `extensions/research/arxiv.ts` - `arxiv_search` tool: keyless arXiv paper/preprint discovery with PDF links
+  - `extensions/research/openalex.ts` - `openalex_search` tool: keyless scholarly metadata search with citation counts, DOI/venue info, abstracts, and OA/PDF links
   - `extensions/pdf/pdf-read.ts` - `pdf_info` + `pdf_read` tools: `pdftotext` with optional Ollama Cloud OCR via `minimax-m3`
 - `docs/` - design docs and roadmap (start with `docs/research-workflow-improvement-plan.md`)
 - `skills/` - reusable skills (`SKILL.md` folders or top-level markdown)
@@ -119,6 +120,28 @@ Behavior:
 - Use returned PDF URLs with `pdf_info` / `pdf_read` for deep reading.
 
 Command: `/arxiv-search-test <query>`.
+
+## OpenAlex scholarly search
+
+The `openalex_search` tool searches OpenAlex works metadata. It can run anonymously when OpenAlex's anonymous budget is available. Optionally set `OPENALEX_API_KEY` for a free higher daily budget, and `OPENALEX_MAILTO` to include an email in requests.
+
+Use this when you want broader literature discovery than arXiv: older/foundational papers, published venue metadata, citation counts, DOI lookup by search, related-work seeds, and open-access links.
+
+Parameters of note:
+
+- `query` - natural-language paper/literature query
+- `fromYear` / `toYear` - publication-year bounds
+- `openAccessOnly` - restrict to works OpenAlex marks as open access
+- `sort` - `relevance` (default), `cited_by_count`, or `publication_date`
+- `page` / `maxResults` - pagination and result count (`maxResults` defaults to 10, capped at 50)
+
+Behavior:
+
+- Returns title, authors, year/date, work type, venue/source, DOI, landing page, PDF URL when available, open-access status/URL, citation count, abstract when available, topics/concepts, related-work IDs, and reported OpenAlex request cost when provided.
+- Treat OpenAlex as metadata discovery, not as proof. Use `web_read` / `pdf_read` on the actual paper before making detailed claims.
+- Complements `arxiv_search`: arXiv is strong for recent preprints; OpenAlex is stronger for broader literature mapping and citation-aware triage.
+
+Command: `/openalex-search-test <query>`.
 
 ## PDF reading / OCR
 

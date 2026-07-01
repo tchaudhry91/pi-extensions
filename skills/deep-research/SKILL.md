@@ -2,7 +2,7 @@
 name: deep-research
 description: Multi-round web research methodology. Searches from multiple angles, fetches full page contents, cross-references findings, identifies gaps, and produces a synthesized markdown document with inline citations. Use for deep topic exploration, literature surveys, technology comparisons, or any task requiring thorough web-sourced information synthesis.
 metadata:
-  tools: searxng_search, arxiv_search, web_read, pdf_info, pdf_read, write, read, bash
+  tools: searxng_search, arxiv_search, openalex_search, web_read, pdf_info, pdf_read, write, read, bash
 ---
 
 # Deep Research
@@ -13,6 +13,7 @@ Multi-round web research methodology. Goes deep: multiple search angles, full so
 
 - **`searxng_search`** — web search (supports categories, time ranges, languages)
 - **`arxiv_search`** — academic preprint discovery with arXiv IDs, abstracts, categories, and PDF links (no login/API key)
+- **`openalex_search`** — broader scholarly metadata search with citation counts, DOI/venue info, abstracts, topics, related-work IDs, and OA/PDF links (anonymous when budget is available; optional `OPENALEX_API_KEY` improves budget)
 - **`web_read`** — extract readable content from URLs (modes, caching, `offset`/`limit` chunking)
 - **`pdf_info` / `pdf_read`** — inspect and read PDFs from arXiv or other sources
 - **`write`** — write the final document to disk
@@ -32,7 +33,7 @@ Before searching, decompose the topic into **3-5 distinct angles**. Each angle s
 | Comparative | "topic vs alternative comparison" | Context, trade-offs |
 | News/Recent | "topic latest developments 2025" | Timeliness, trends |
 
-Run all general-web queries in parallel with `searxng_search`, 5-8 results each. Use time ranges when recency matters. For academic/literature topics, also run `arxiv_search` using 2-4 vocabulary variants; start broad, then refine based on terms discovered in paper titles/abstracts. Remember that arXiv papers are preprints and are not necessarily peer reviewed.
+Run all general-web queries in parallel with `searxng_search`, 5-8 results each. Use time ranges when recency matters. For academic/literature topics, also run `arxiv_search` using 2-4 vocabulary variants for recent preprints and `openalex_search` for broader citation-aware discovery. Start broad, then refine based on terms discovered in paper titles/abstracts. Remember that arXiv papers are preprints and OpenAlex is metadata aggregation; neither replaces reading the actual paper.
 
 ### Phase 2: Source Triage
 
@@ -41,7 +42,7 @@ From search results, select sources for deep reading. Prioritize:
 2. **Authoritative secondary**: respected publications, well-known authors, .edu/.gov domains
 3. **Diverse perspectives**: different viewpoints, contrarian takes, practical vs theoretical
 
-For `arxiv_search` results, triage by title, abstract, date, categories, venue/comment field, and relevance to the user's question. Do not treat arXiv presence as validation; use `pdf_info`/`pdf_read` on promising PDFs before making detailed claims.
+For `arxiv_search` results, triage by title, abstract, date, categories, venue/comment field, and relevance to the user's question. For `openalex_search` results, triage by title, abstract, year, venue/source, citation count, DOI, open-access/PDF availability, and topic/concept fit. Do not treat arXiv presence, OpenAlex metadata, or citation count as validation; use `pdf_info`/`pdf_read` or `web_read` on promising papers before making detailed claims.
 
 Skip: SEO spam, content farms, aggregators that just link elsewhere, sources older than relevance cutoff unless historical context is needed.
 

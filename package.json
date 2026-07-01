@@ -32,6 +32,7 @@
       "./extensions/search/searxng.ts",
       "./extensions/fetch/web-read.ts",
       "./extensions/research/arxiv.ts",
+      "./extensions/research/openalex.ts",
       "./extensions/pdf/pdf-read.ts"
     ],
     "skills": [

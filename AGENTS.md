@@ -21,6 +21,7 @@ The `package.json` `"pi"` section declares what pi loads:
       "./extensions/search/searxng.ts",
       "./extensions/fetch/web-read.ts",
       "./extensions/research/arxiv.ts",
+      "./extensions/research/openalex.ts",
       "./extensions/pdf/pdf-read.ts"
     ],
     "skills": ["./skills"],
@@ -50,7 +51,8 @@ pi-extensions/
 │   ├── fetch/           # Web reading
 │   │   └── web-read.ts       # registers the `web_read` tool
 │   ├── research/        # Research / paper discovery tools
-│   │   └── arxiv.ts          # registers the `arxiv_search` tool
+│   │   ├── arxiv.ts          # registers the `arxiv_search` tool
+│   │   └── openalex.ts       # registers the `openalex_search` tool
 │   └── pdf/             # PDF reading / OCR
 │       └── pdf-read.ts      # registers `pdf_info` + `pdf_read`
 ├── skills/              # Skill markdown folders (SKILL.md)
@@ -111,7 +113,8 @@ Caching: `ollama-cloud.ts` demonstrates a file-based cache in `getAgentDir()/cac
 
 Tool extensions register custom tools callable by the LLM. See
 `extensions/search/searxng.ts`, `extensions/fetch/web-read.ts`,
-`extensions/research/arxiv.ts`, and `extensions/pdf/pdf-read.ts`.
+`extensions/research/arxiv.ts`, `extensions/research/openalex.ts`, and
+`extensions/pdf/pdf-read.ts`.
 
 Key steps:
 1. Define parameters using TypeBox schemas (`Type.Object`, `Type.String`, `Type.Integer`, `StringEnum`, etc.)
@@ -217,6 +220,8 @@ Extensions may read these environment variables:
 | `PDF_OCR_BASE_URL` | pdf-read | OCR endpoint override |
 | `PDF_OCR_API_KEY` | pdf-read | Dedicated OCR API key (fallbacks: `OLLAMA_CLOUD_API_KEY`, `OLLAMA_API_KEY`) |
 | `SEARXNG_URL` | searxng | SearXNG instance URL (default: `https://search.ts.tux-sudo.com`) |
+| `OPENALEX_API_KEY` | openalex | Optional free OpenAlex API key for higher daily search budget |
+| `OPENALEX_MAILTO` | openalex | Optional email passed to OpenAlex for polite API usage |
 | `ZAI_CODING_API_KEY` | zai-coding (dormant) | ZAI Coding API key — only relevant if zai-coding is re-enabled |
 
 ## License
